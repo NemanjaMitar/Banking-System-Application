@@ -1,0 +1,44 @@
+﻿<Window x:Class="BankingSystem.AccountsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Add Account" Height="350" Width="400">
+
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="150"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <TextBlock Text="Account Number:" Grid.Row="0" Grid.Column="0" Margin="5"/>
+        <TextBox Text="{Binding NewAccount.AccountNumber}" Grid.Row="0" Grid.Column="1" Margin="5"/>
+
+        <TextBlock Text="Balance:" Grid.Row="1" Grid.Column="0" Margin="5"/>
+        <TextBox Text="{Binding NewAccount.Balance}" Grid.Row="1" Grid.Column="1" Margin="5"/>
+
+        <TextBlock Text="Holder ID:" Grid.Row="2" Grid.Column="0" Margin="5"/>
+        <TextBox Text="{Binding NewAccount.HolderId}" Grid.Row="2" Grid.Column="1" Margin="5"/>
+
+        <TextBlock Text="Currency:" Grid.Row="3" Grid.Column="0" Margin="5"/>
+        <ComboBox ItemsSource="{Binding CurrencyOptions}"
+                  SelectedItem="{Binding NewAccount.Currency}"
+                  Grid.Row="3" Grid.Column="1" Margin="5"/>
+
+        <CheckBox Content="Can receive international transfer"
+                  IsChecked="{Binding NewAccount.CanReceiveInternationalTransfer}"
+                  Grid.Row="4" Grid.ColumnSpan="2" Margin="5"/>
+
+        <StackPanel Orientation="Horizontal" Grid.Row="5" Grid.ColumnSpan="2" HorizontalAlignment="Right" Margin="5">
+            <Button Content="Add" Width="80" Margin="5" Click="AddBtn_Click"/>
+            <Button Content="Cancel" Width="80" Margin="5" Click="CancelBtn_Click"/>
+        </StackPanel>
+    </Grid>
+</Window>

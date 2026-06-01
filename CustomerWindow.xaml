@@ -1,0 +1,39 @@
+﻿<Window x:Class="BankingSystem.CustomerWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Add Customer"
+        Height="220"
+        Width="400"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize">
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Text="Full Name"
+                   FontWeight="SemiBold"
+                   Margin="0,0,0,8"/>
+
+        <TextBox x:Name="txtFullName"
+                 Grid.Row="1"
+                 Height="32"
+                 Margin="0,0,0,20"/>
+
+        <StackPanel Grid.Row="3"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Right">
+            <Button Content="Add"
+                    Width="90"
+                    Margin="0,0,10,0"
+                    Click="AddBtn_Click"/>
+            <Button Content="Cancel"
+                    Width="90"
+                    Click="CancelBtn_Click"/>
+        </StackPanel>
+    </Grid>
+</Window>
