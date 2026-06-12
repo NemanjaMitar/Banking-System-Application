@@ -5,77 +5,51 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BankingSystem.Model
 {
-    //==========================| Polazna klasa svih racuna |========================
-    /// <summary>
-    /// Svaki racun ce da implementira polja poput broja racuna, Id, ClientId i stanja
-    /// Implementira 2 interfejsa, za Binding i nas za funkcionalnost racuna
-    /// </summary>
-
     public abstract class AccountBase : INotifyPropertyChanged, IAccount
     {
-        private long accountNumber;
         private decimal balance;
         private Guid accountGuid;
         private Guid customerId;
+        private string iban;
+        private Country country = Country.RS; // domestic default
 
         #region Properties, INotifyPropertyChanged
+
         [Key]
-        public long AccountNumber
+        [StringLength(34)]
+        public string Iban
         {
-            get => accountNumber;
-            set
-            {
-                if (accountNumber != value)
-                {
-                    accountNumber = value;
-                    OnPropertyChanged(nameof(AccountNumber));
-                }
-            }
+            get => iban;
+            set { if (iban != value) { iban = value; OnPropertyChanged(nameof(Iban)); } }
         }
 
         public Guid AccountGuid
         {
             get => accountGuid;
-            set
-            {
-                if (accountGuid != value)
-                {
-                    accountGuid = value;
-                    OnPropertyChanged(nameof(AccountGuid));
-                }
-            }
+            set { if (accountGuid != value) { accountGuid = value; OnPropertyChanged(nameof(AccountGuid)); } }
         }
 
         public decimal Balance
         {
             get => balance;
-            set
-            {
-                if (balance != value)
-                {
-                    balance = value;
-                    OnPropertyChanged(nameof(Balance));
-                }
-            }
+            set { if (balance != value) { balance = value; OnPropertyChanged(nameof(Balance)); } }
         }
 
         [ForeignKey(nameof(Customer))]
         public Guid CustomerId
         {
             get => customerId;
-            set
-            {
-                if (customerId != value)
-                {
-                    customerId = value;
-                    OnPropertyChanged(nameof(CustomerId));
-                }
-            }
+            set { if (customerId != value) { customerId = value; OnPropertyChanged(nameof(CustomerId)); } }
+        }
+
+        public virtual Country Country
+        {
+            get => country;
+            set { if (country != value) { country = value; OnPropertyChanged(nameof(Country)); } }
         }
         #endregion
 
         public virtual Customer Customer { get; set; }
-
 
         //========================| KONSTRUKTORI |===========================
         protected AccountBase()
@@ -83,24 +57,18 @@ namespace BankingSystem.Model
             AccountGuid = Guid.NewGuid();
         }
 
-        protected AccountBase(Guid customerId, long accountNumber, decimal balance = 0)
+        protected AccountBase(Guid customerId, decimal balance = 0)
         {
             AccountGuid = Guid.NewGuid();
             CustomerId = customerId;
-            AccountNumber = accountNumber;
             Balance = balance;
         }
 
-
         #region IAccount
-
         public virtual void Deposit(decimal amount)
         {
             if (amount <= 0)
-            {
                 throw new ArgumentException("Amount must be greater than zero.");
-            }
-
             Balance += amount;
         }
 
@@ -108,17 +76,14 @@ namespace BankingSystem.Model
         {
             if (amount <= 0)
                 throw new ArgumentException("Amount must be greater than zero.");
-
             if (amount > Balance)
                 throw new InvalidOperationException("Insufficient funds.");
-
             Balance -= amount;
         }
 
         public decimal GetBalance() => Balance;
-        public long GetAccountNumber() => AccountNumber;
+        public string GetIban() => Iban;
 
-        // Will be overriden in child classes
         public abstract Currency GetCurrency();
         public abstract bool CanReceiveInternationalTransfer();
         #endregion
@@ -137,14 +102,11 @@ namespace BankingSystem.Model
                 }
             }
         }
+
         #region INotifyPropertyChangedEvent
         public event PropertyChangedEventHandler PropertyChanged;
-
         protected void OnPropertyChanged(string propertyName)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-
+            => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         #endregion
     }
 }

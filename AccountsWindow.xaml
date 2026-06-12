@@ -17,26 +17,26 @@
             <ColumnDefinition Width="150"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
-
-        <TextBlock Text="Account Number:" Grid.Row="0" Grid.Column="0" Margin="5"/>
-        <TextBox Text="{Binding NewAccount.AccountNumber}" Grid.Row="0" Grid.Column="1" Margin="5"/>
-
-        <TextBlock Text="Balance:" Grid.Row="1" Grid.Column="0" Margin="5"/>
-        <TextBox Text="{Binding NewAccount.Balance}" Grid.Row="1" Grid.Column="1" Margin="5"/>
-
-        <TextBlock Text="Holder ID:" Grid.Row="2" Grid.Column="0" Margin="5"/>
-        <TextBox Text="{Binding NewAccount.HolderId}" Grid.Row="2" Grid.Column="1" Margin="5"/>
+        <TextBlock Text="Country:" Grid.Row="2" Grid.Column="0" Margin="5"/>
+        <ComboBox ItemsSource="{Binding CountryOptions}"
+          SelectedItem="{Binding SelectedCountry}"
+          Grid.Row="2" Grid.Column="1" Margin="5"/>
+        <TextBlock Text="Initial Balance:" Grid.Row="1" Grid.Column="0" Margin="5"/>
+        <TextBox Text="{Binding InitialBalance, UpdateSourceTrigger=PropertyChanged}"
+                 Grid.Row="1" Grid.Column="1" Margin="5"/>
 
         <TextBlock Text="Currency:" Grid.Row="3" Grid.Column="0" Margin="5"/>
         <ComboBox ItemsSource="{Binding CurrencyOptions}"
-                  SelectedItem="{Binding NewAccount.Currency}"
+                  SelectedItem="{Binding SelectedCurrency}"
                   Grid.Row="3" Grid.Column="1" Margin="5"/>
 
         <CheckBox Content="Can receive international transfer"
-                  IsChecked="{Binding NewAccount.CanReceiveInternationalTransfer}"
+                  IsChecked="{Binding CanReceiveInternationalTransfer, Mode=OneWay}"
+                  IsEnabled="False"
                   Grid.Row="4" Grid.ColumnSpan="2" Margin="5"/>
-
-        <StackPanel Orientation="Horizontal" Grid.Row="5" Grid.ColumnSpan="2" HorizontalAlignment="Right" Margin="5">
+        
+        <StackPanel Orientation="Horizontal" Grid.Row="5" Grid.ColumnSpan="2"
+                    HorizontalAlignment="Right" Margin="5">
             <Button Content="Add" Width="80" Margin="5" Click="AddBtn_Click"/>
             <Button Content="Cancel" Width="80" Margin="5" Click="CancelBtn_Click"/>
         </StackPanel>

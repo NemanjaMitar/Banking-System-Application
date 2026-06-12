@@ -17,7 +17,7 @@ namespace BankingSystem.Model
         // Vracanje trenutnog stanja
         decimal GetBalance();
         // Vracanje broja racuna
-        long GetAccountNumber();
+        string GetIban();              // was: long GetAccountNumber();
         // Vracanje valute koja se koristi za transakcije
         Currency GetCurrency();
         // Vracanje mogucnosti transfera izmedju dva racuna razlicitog tipa
