@@ -5,22 +5,29 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BankingSystem.Model
 {
+    //==========================| Polazna klasa svih racuna |========================
+    /// <summary>
+    /// Svaki racun ce da implementira polja poput broja racuna, Id, ClientId i stanja
+    /// Implementira 2 interfejsa, za Binding i nas za funkcionalnost racuna
+    /// </summary>
+
     public abstract class AccountBase : INotifyPropertyChanged, IAccount
     {
-        private long _accountNumber;
-        private decimal _balance;
-        private Guid _accountGuid;
-        private int _customerId;
+        private long accountNumber;
+        private decimal balance;
+        private Guid accountGuid;
+        private Guid customerId;
 
+        #region Properties, INotifyPropertyChanged
         [Key]
         public long AccountNumber
         {
-            get => _accountNumber;
+            get => accountNumber;
             set
             {
-                if (_accountNumber != value)
+                if (accountNumber != value)
                 {
-                    _accountNumber = value;
+                    accountNumber = value;
                     OnPropertyChanged(nameof(AccountNumber));
                 }
             }
@@ -28,12 +35,12 @@ namespace BankingSystem.Model
 
         public Guid AccountGuid
         {
-            get => _accountGuid;
+            get => accountGuid;
             set
             {
-                if (_accountGuid != value)
+                if (accountGuid != value)
                 {
-                    _accountGuid = value;
+                    accountGuid = value;
                     OnPropertyChanged(nameof(AccountGuid));
                 }
             }
@@ -41,39 +48,42 @@ namespace BankingSystem.Model
 
         public decimal Balance
         {
-            get => _balance;
+            get => balance;
             set
             {
-                if (_balance != value)
+                if (balance != value)
                 {
-                    _balance = value;
+                    balance = value;
                     OnPropertyChanged(nameof(Balance));
                 }
             }
         }
 
         [ForeignKey(nameof(Customer))]
-        public int CustomerId
+        public Guid CustomerId
         {
-            get => _customerId;
+            get => customerId;
             set
             {
-                if (_customerId != value)
+                if (customerId != value)
                 {
-                    _customerId = value;
+                    customerId = value;
                     OnPropertyChanged(nameof(CustomerId));
                 }
             }
         }
+        #endregion
 
         public virtual Customer Customer { get; set; }
 
+
+        //========================| KONSTRUKTORI |===========================
         protected AccountBase()
         {
             AccountGuid = Guid.NewGuid();
         }
 
-        protected AccountBase(int customerId, long accountNumber, decimal balance = 0)
+        protected AccountBase(Guid customerId, long accountNumber, decimal balance = 0)
         {
             AccountGuid = Guid.NewGuid();
             CustomerId = customerId;
@@ -81,17 +91,15 @@ namespace BankingSystem.Model
             Balance = balance;
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
 
-        protected void OnPropertyChanged(string propertyName)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
+        #region IAccount
 
         public virtual void Deposit(decimal amount)
         {
             if (amount <= 0)
+            {
                 throw new ArgumentException("Amount must be greater than zero.");
+            }
 
             Balance += amount;
         }
@@ -107,6 +115,14 @@ namespace BankingSystem.Model
             Balance -= amount;
         }
 
+        public decimal GetBalance() => Balance;
+        public long GetAccountNumber() => AccountNumber;
+
+        // Will be overriden in child classes
+        public abstract Currency GetCurrency();
+        public abstract bool CanReceiveInternationalTransfer();
+        #endregion
+
         [NotMapped]
         public string CurrencyDisplay
         {
@@ -121,9 +137,14 @@ namespace BankingSystem.Model
                 }
             }
         }
-        public decimal GetBalance() => Balance;
-        public long GetAccountNumber() => AccountNumber;
-        public abstract Currency GetCurrency();
-        public abstract bool CanReceiveInternationalTransfer();
+        #region INotifyPropertyChangedEvent
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected void OnPropertyChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        #endregion
     }
 }

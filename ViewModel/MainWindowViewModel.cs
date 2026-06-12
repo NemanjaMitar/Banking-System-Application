@@ -10,7 +10,7 @@ namespace BankingSystem.ViewModel
 {
     public class MainWindowViewModel : INotifyPropertyChanged
     {
-        private readonly BankContext _context;
+        private readonly BankContext context;
         public ObservableCollection<Customer> Customers { get; set; }
         public ObservableCollection<AccountBase> FilteredAccounts { get; set; }
 
@@ -46,10 +46,9 @@ namespace BankingSystem.ViewModel
         public RelayCommand AddCustomerCommand { get; }
         public MainWindowViewModel()
         {
-            _context = new BankContext();
+            context = new BankContext();
 
-            Customers = new ObservableCollection<Customer>(
-                _context.Customers.Include(c => c.Accounts).ToList());
+            Customers = new ObservableCollection<Customer>(context.Customers.Include(c => c.Accounts).ToList());
 
             FilteredAccounts = new ObservableCollection<AccountBase>();
 
@@ -71,7 +70,7 @@ namespace BankingSystem.ViewModel
             if (SelectedCustomer == null)
                 return;
 
-            var accounts = _context.Accounts
+            var accounts = context.Accounts
                 .Include(a => a.Customer)
                 .Where(a => a.CustomerId == SelectedCustomer.Id)
                 .ToList();
@@ -97,8 +96,8 @@ namespace BankingSystem.ViewModel
                 AccountBase newAccount = window.NewAccount;
                 newAccount.AccountNumber = GenerateAccountNumber();
 
-                _context.Accounts.Add(newAccount);
-                _context.SaveChanges();
+                context.Accounts.Add(newAccount);
+                context.SaveChanges();
 
                 LoadAccountsForSelectedCustomer();
             }
@@ -125,18 +124,18 @@ namespace BankingSystem.ViewModel
 
             if (res == MessageBoxResult.Yes)
             {
-                _context.Accounts.Remove(SelectedAccount);
-                _context.SaveChanges();
+                context.Accounts.Remove(SelectedAccount);
+                context.SaveChanges();
                 LoadAccountsForSelectedCustomer();
             }
         }
 
         private long GenerateAccountNumber()
         {
-            if (!_context.Accounts.Any())
+            if (!context.Accounts.Any())
                 return 1000000001;
 
-            return _context.Accounts.Max(a => a.AccountNumber) + 1;
+            return context.Accounts.Max(a => a.AccountNumber) + 1;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -154,8 +153,8 @@ namespace BankingSystem.ViewModel
             {
                 Customer newCustomer = window.NewCustomer;
 
-                _context.Customers.Add(newCustomer);
-                _context.SaveChanges();
+                context.Customers.Add(newCustomer);
+                context.SaveChanges();
 
                 Customers.Add(newCustomer);
 

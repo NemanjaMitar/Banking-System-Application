@@ -1,5 +1,5 @@
-﻿using BankingSystem.Model;
-using System.Windows;
+﻿using System.Windows;
+using BankingSystem.Model;
 
 namespace BankingSystem
 {
@@ -14,17 +14,21 @@ namespace BankingSystem
 
         private void AddBtn_Click(object sender, RoutedEventArgs e)
         {
-            string fullName = txtFullName.Text?.Trim();
+            string firstName = txtFirstName.Text?.Trim();
+            string lastName = txtLastName.Text?.Trim();
 
-            if (string.IsNullOrWhiteSpace(fullName))
+            if (string.IsNullOrWhiteSpace(firstName) || string.IsNullOrWhiteSpace(lastName))
             {
-                MessageBox.Show("Customer name is required.");
+                MessageBox.Show("First and last name are required.");
                 return;
             }
 
             NewCustomer = new Customer
             {
-                FullName = fullName
+                FirstName = firstName,
+                LastName = lastName,
+                DateOfBirth = dpDateOfBirth.SelectedDate,
+                Email = txtEmail.Text?.Trim()
             };
 
             DialogResult = true;

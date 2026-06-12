@@ -19,6 +19,8 @@ namespace BankingSystem
 
         private void AddBtn_Click(object sender, RoutedEventArgs e)
         {
+
+            // Validiraj podatke koje je korisnik uneo
             NewAccount = new DinarskiAccount(_customer.Id, 0, InitialBalance);
             DialogResult = true;
             Close();

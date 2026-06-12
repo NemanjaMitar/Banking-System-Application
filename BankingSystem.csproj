@@ -81,12 +81,12 @@
       <DependentUpon>CustomerWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Model\BankContext.cs" />
-    <Compile Include="Model\Customer.cs" />
-    <Compile Include="Model\DevizniAccount.cs" />
-    <Compile Include="Model\DinarskiAccount.cs" />
-    <Compile Include="Model\AccountBase.cs" />
+    <Compile Include="Model\ClientModel\Customer.cs" />
+    <Compile Include="Model\AccountsModel\DevizniAccount.cs" />
+    <Compile Include="Model\AccountsModel\DinarskiAccount.cs" />
+    <Compile Include="Model\AccountsModel\AccountBase.cs" />
     <Compile Include="Model\ECurrency.cs" />
-    <Compile Include="Model\IAccount.cs" />
+    <Compile Include="Model\AccountsModel\IAccount.cs" />
     <Compile Include="ViewModel\AccountsWindowViewModel.cs" />
     <Compile Include="ViewModel\MainWindowViewModel.cs" />
     <Compile Include="ViewModel\RelayCommand.cs" />

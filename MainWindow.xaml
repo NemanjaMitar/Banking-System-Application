@@ -70,7 +70,6 @@
                                 <DataGridTextColumn Header="Account Number" Binding="{Binding AccountNumber}" Width="2*"/>
                                 <DataGridTextColumn Header="Balance" Binding="{Binding Balance}" Width="*"/>
                                 <DataGridTextColumn Header="Currency" Binding="{Binding CurrencyDisplay}" Width="*" />
-                                <DataGridTextColumn Header="CustomerId" Binding="{Binding CustomerId}" Width="*"/>
                             </DataGrid.Columns>
                         </DataGrid>
                     </GroupBox>
