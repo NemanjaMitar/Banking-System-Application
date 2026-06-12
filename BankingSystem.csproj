@@ -26,7 +26,7 @@
     <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
+    <WarningLevel>0</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -77,16 +77,18 @@
     <Compile Include="AccountsWindow.xaml.cs">
       <DependentUpon>AccountsWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Converters\CountryToFlagConverter.cs" />
     <Compile Include="CustomerWindow.xaml.cs">
       <DependentUpon>CustomerWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="IbanGenerator.cs" />
     <Compile Include="Model\BankContext.cs" />
-    <Compile Include="Model\Customer.cs" />
-    <Compile Include="Model\DevizniAccount.cs" />
-    <Compile Include="Model\DinarskiAccount.cs" />
-    <Compile Include="Model\AccountBase.cs" />
+    <Compile Include="Model\ClientModel\Customer.cs" />
+    <Compile Include="Model\AccountsModel\DevizniAccount.cs" />
+    <Compile Include="Model\AccountsModel\DinarskiAccount.cs" />
+    <Compile Include="Model\AccountsModel\AccountBase.cs" />
     <Compile Include="Model\ECurrency.cs" />
-    <Compile Include="Model\IAccount.cs" />
+    <Compile Include="Model\AccountsModel\IAccount.cs" />
     <Compile Include="ViewModel\AccountsWindowViewModel.cs" />
     <Compile Include="ViewModel\MainWindowViewModel.cs" />
     <Compile Include="ViewModel\RelayCommand.cs" />
@@ -160,7 +162,12 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Resource Include="Images\Flags\rs.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Flags\de.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="packages\MaterialDesignThemes.5.3.2\build\MaterialDesignThemes.targets" Condition="Exists('packages\MaterialDesignThemes.5.3.2\build\MaterialDesignThemes.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

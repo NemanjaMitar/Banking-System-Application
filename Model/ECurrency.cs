@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace BankingSystem.Model
 {
+    //================| Helper enum za rad sa valutama |================
     public enum Currency
     {
         RSD=0,

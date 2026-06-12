@@ -6,12 +6,10 @@ namespace BankingSystem.Model
     {
         public Currency ForeignCurrency { get; set; }
 
-        public DevizniAccount() : base()
-        {
-        }
+        public DevizniAccount() : base() { }
 
-        public DevizniAccount(int customerId, long accountNumber, Currency currency, decimal balance = 0)
-            : base(customerId, accountNumber, balance)
+        public DevizniAccount(Guid customerId, Currency currency, decimal balance = 0)
+            : base(customerId, balance)
         {
             if (currency == Currency.RSD)
                 throw new ArgumentException("Devizni račun ne može biti u RSD.");

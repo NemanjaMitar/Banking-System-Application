@@ -1,4 +1,5 @@
 ﻿using BankingSystem.Model;
+using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Data.Entity;
@@ -10,7 +11,9 @@ namespace BankingSystem.ViewModel
 {
     public class MainWindowViewModel : INotifyPropertyChanged
     {
-        private readonly BankContext _context;
+        private readonly BankContext context;
+        private static readonly Random _rng = new Random();
+
         public ObservableCollection<Customer> Customers { get; set; }
         public ObservableCollection<AccountBase> FilteredAccounts { get; set; }
 
@@ -33,37 +36,91 @@ namespace BankingSystem.ViewModel
         public AccountBase SelectedAccount
         {
             get => _selectedAccount;
-            set
-            {
-                _selectedAccount = value;
-                OnPropertyChanged();
-            }
+            set { _selectedAccount = value; OnPropertyChanged(); }
         }
 
         public RelayCommand AddCommand { get; }
         public RelayCommand DetailsCommand { get; }
         public RelayCommand DeleteCommand { get; }
         public RelayCommand AddCustomerCommand { get; }
+
+        public RelayCommand UpdateAccountCommand { get; }
+        public RelayCommand UpdateCustomerCommand { get; }
+        public RelayCommand DeleteCustomerCommand { get; }
+
         public MainWindowViewModel()
         {
-            _context = new BankContext();
+
+            if (DesignerProperties.GetIsInDesignMode(new DependencyObject()))
+                return;   // designer: skip DB access, no connection string needed
+            context = new BankContext();
 
             Customers = new ObservableCollection<Customer>(
-                _context.Customers.Include(c => c.Accounts).ToList());
+                context.Customers.Include(c => c.Accounts).ToList());
 
             FilteredAccounts = new ObservableCollection<AccountBase>();
 
             if (Customers.Any())
-            {
                 SelectedCustomer = Customers.First();
-            }
 
             AddCommand = new RelayCommand(OnAdd);
             DetailsCommand = new RelayCommand(OnDetails);
             DeleteCommand = new RelayCommand(OnDelete);
             AddCustomerCommand = new RelayCommand(OnAddCustomer);
+            UpdateAccountCommand = new RelayCommand(OnUpdateAccount);
+            UpdateCustomerCommand = new RelayCommand(OnUpdateCustomer);
+            DeleteCustomerCommand = new RelayCommand(OnDeleteCustomer);
         }
 
+        private void OnUpdateAccount()
+        {
+            if (SelectedAccount == null) { MessageBox.Show("Select an account first."); return; }
+
+            // reuse the account dialog as an editor, prefilled
+            var window = new AccountsWindow(SelectedCustomer, SelectedAccount);
+            if (window.ShowDialog() == true)
+            {
+                // SelectedAccount was edited in-place by the dialog
+                context.Entry(SelectedAccount).State = EntityState.Modified;
+                context.SaveChanges();
+                LoadAccountsForSelectedCustomer();
+            }
+        }
+
+        private void OnUpdateCustomer()
+        {
+            if (SelectedCustomer == null) { MessageBox.Show("Select a customer first."); return; }
+
+            var window = new CustomerWindow(SelectedCustomer);   // editing overload
+            if (window.ShowDialog() == true)
+            {
+                context.Entry(SelectedCustomer).State = EntityState.Modified;
+                context.SaveChanges();
+                // refresh the displayed row
+                int i = Customers.IndexOf(SelectedCustomer);
+                Customers[i] = SelectedCustomer;
+            }
+        }
+
+        private void OnDeleteCustomer()
+        {
+            if (SelectedCustomer == null) return;
+
+            var res = MessageBox.Show(
+                $"Delete {SelectedCustomer.FullName} and ALL their accounts?",
+                "Delete customer", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+            if (res != MessageBoxResult.Yes) return;
+
+            // remove dependent accounts first (unless cascade delete is configured)
+            var accounts = context.Accounts
+                .Where(a => a.CustomerId == SelectedCustomer.Id).ToList();
+            context.Accounts.RemoveRange(accounts);
+            context.Customers.Remove(SelectedCustomer);
+            context.SaveChanges();
+
+            Customers.Remove(SelectedCustomer);
+            SelectedCustomer = Customers.FirstOrDefault();
+        }
         private void LoadAccountsForSelectedCustomer()
         {
             FilteredAccounts.Clear();
@@ -71,15 +128,13 @@ namespace BankingSystem.ViewModel
             if (SelectedCustomer == null)
                 return;
 
-            var accounts = _context.Accounts
+            var accounts = context.Accounts
                 .Include(a => a.Customer)
                 .Where(a => a.CustomerId == SelectedCustomer.Id)
                 .ToList();
 
             foreach (var account in accounts)
-            {
                 FilteredAccounts.Add(account);
-            }
         }
 
         private void OnAdd()
@@ -95,13 +150,32 @@ namespace BankingSystem.ViewModel
             if (window.ShowDialog() == true && window.NewAccount != null)
             {
                 AccountBase newAccount = window.NewAccount;
-                newAccount.AccountNumber = GenerateAccountNumber();
+                newAccount.Iban = GenerateIban(newAccount.Country);
 
-                _context.Accounts.Add(newAccount);
-                _context.SaveChanges();
+                context.Accounts.Add(newAccount);
+                context.SaveChanges();
 
                 LoadAccountsForSelectedCustomer();
             }
+        }
+
+        // Builds a fresh 13-digit account seed, generates the IBAN, retries on collision.
+        private string GenerateIban(Country country)
+        {
+            // account-number length per country
+            int digits = country == Country.DE ? 10 : 13;
+            long max = (long)Math.Pow(10, digits);
+            long min = (long)Math.Pow(10, digits - 1);
+
+            string iban;
+            do
+            {
+                long seed = (long)(_rng.NextDouble() * (max - min)) + min;
+                iban = IbanGenerator.Generate(country, "260", seed);
+            }
+            while (context.Accounts.Any(a => a.Iban == iban));
+
+            return iban;
         }
 
         private void OnDetails()
@@ -109,10 +183,11 @@ namespace BankingSystem.ViewModel
             if (SelectedAccount == null) return;
 
             MessageBox.Show(
-                $"Account number: {SelectedAccount.AccountNumber}\n" +
+                $"IBAN: {SelectedAccount.Iban}\n" +
                 $"GUID: {SelectedAccount.AccountGuid}\n" +
                 $"Balance: {SelectedAccount.Balance}\n" +
                 $"Customer: {SelectedCustomer?.FullName}\n" +
+                $"Country: {SelectedAccount.Country}\n" +
                 $"Currency: {SelectedAccount.GetCurrency()}\n" +
                 $"International transfers: {SelectedAccount.CanReceiveInternationalTransfer()}");
         }
@@ -121,29 +196,15 @@ namespace BankingSystem.ViewModel
         {
             if (SelectedAccount == null) return;
 
-            var res = MessageBox.Show("Are you sure?", "Deleting selected account", MessageBoxButton.YesNo);
+            var res = MessageBox.Show("Are you sure?", "Deleting selected account",
+                                      MessageBoxButton.YesNo);
 
             if (res == MessageBoxResult.Yes)
             {
-                _context.Accounts.Remove(SelectedAccount);
-                _context.SaveChanges();
+                context.Accounts.Remove(SelectedAccount);
+                context.SaveChanges();
                 LoadAccountsForSelectedCustomer();
             }
-        }
-
-        private long GenerateAccountNumber()
-        {
-            if (!_context.Accounts.Any())
-                return 1000000001;
-
-            return _context.Accounts.Max(a => a.AccountNumber) + 1;
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        protected void OnPropertyChanged([CallerMemberName] string name = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
 
         private void OnAddCustomer()
@@ -154,8 +215,8 @@ namespace BankingSystem.ViewModel
             {
                 Customer newCustomer = window.NewCustomer;
 
-                _context.Customers.Add(newCustomer);
-                _context.SaveChanges();
+                context.Customers.Add(newCustomer);
+                context.SaveChanges();
 
                 Customers.Add(newCustomer);
 
@@ -163,5 +224,10 @@ namespace BankingSystem.ViewModel
                     SelectedCustomer = newCustomer;
             }
         }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected void OnPropertyChanged([CallerMemberName] string name = null)
+            => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
     }
 }
