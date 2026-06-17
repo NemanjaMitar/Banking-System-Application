@@ -127,7 +127,7 @@ namespace BankingSystem.ViewModel
 
             if (SelectedCustomer == null)
                 return;
-
+            // Probati mozda odraditi bypass ovog fielda? I raditi preko kljuceva? Zar nije to cela poenta DB?
             var accounts = context.Accounts
                 .Include(a => a.Customer)
                 .Where(a => a.CustomerId == SelectedCustomer.Id)
