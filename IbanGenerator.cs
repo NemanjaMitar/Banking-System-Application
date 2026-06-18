@@ -8,6 +8,7 @@ namespace BankingSystem.Model
     {
         RS, // Serbia  — IBAN length 22, BBAN 18
         DE, // Germany — IBAN length 22, BBAN 18
+
     }
 
 
@@ -18,7 +19,7 @@ namespace BankingSystem.Model
             new Dictionary<Country, int>
             {
                 { Country.RS, 18 },
-                { Country.DE, 18 },
+                { Country.DE, 18 }
             };
 
         private static string BuildGermanBban(string bankCode, long accountNumber)
@@ -29,6 +30,7 @@ namespace BankingSystem.Model
                 acct = acct.Substring(acct.Length - 10);                 // keep last 10
             return bank + acct;                                          // 8 + 10 = 18
         }
+
 
         public static string Generate(Country country, string bankCode, long accountNumber)
         {

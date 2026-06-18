@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="clr-namespace:BankingSystem.ViewModel"
         xmlns:conv="clr-namespace:BankingSystem.Converters"
-        Title="Banking System" Height="600" Width="1100"
+        Title="Banking System" Height="600" Width="1445"
         WindowStartupLocation="CenterScreen">
 
     <Window.DataContext>
@@ -12,6 +12,49 @@
 
     <Window.Resources>
         <conv:CountryToFlagConverter x:Key="CountryToFlag"/>
+
+        <!-- Bazni flat stil -->
+        <Style x:Key="FlatButton" TargetType="Button">
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Padding" Value="10,6"/>
+            <Setter Property="Margin" Value="0,0,8,0"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border" Background="{TemplateBinding Background}"
+                            CornerRadius="6" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                          VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Opacity" Value="0.85"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="border" Property="Opacity" Value="0.5"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Account = siva -->
+        <Style x:Key="AccountButton" TargetType="Button" BasedOn="{StaticResource FlatButton}">
+            <Setter Property="Background" Value="#6B7280"/>
+        </Style>
+
+        <!-- Customer = plava -->
+        <Style x:Key="CustomerButton" TargetType="Button" BasedOn="{StaticResource FlatButton}">
+            <Setter Property="Background" Value="#2196F3"/>
+        </Style>
+
+        <!-- Destruktivno = crvena -->
+        <Style x:Key="DangerButton" TargetType="Button" BasedOn="{StaticResource FlatButton}">
+            <Setter Property="Background" Value="#DC2626"/>
+        </Style>
     </Window.Resources>
 
     <Window.Background>
@@ -31,19 +74,20 @@
                 </Grid.RowDefinitions>
 
                 <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
-                    <Button Content="Add Account" Command="{Binding AddCommand}"
-                            Width="120" Margin="0,0,10,0"/>
-                    <Button Content="Account Details" Command="{Binding DetailsCommand}"
-                            Width="130" Margin="0,0,10,0"/>
-                    <Button Content="Delete Account" Command="{Binding DeleteCommand}"
-                            Width="130"/>
-                    <Button Content="Add Customer" Command="{Binding AddCustomerCommand}"
-                            Width="140" Margin="10,0,10,0"/>
-                    
-                    <Button Content="Update Account"  Command="{Binding UpdateAccountCommand}"  Width="150"/>
-                    <Button Content="Update Customer" Margin="10,0,10,0" Command="{Binding UpdateCustomerCommand}" Width="150"/>
-                    <Button Content="Delete Customer" Command="{Binding DeleteCustomerCommand}" Width="145"
-        Background="#DC2626"/>
+                    <!-- ACCOUNT -->
+                    <Button Content="Add Account"     Command="{Binding AddCommand}"           Width="120" Style="{StaticResource AccountButton}"/>
+                    <Button Content="Account Details" Command="{Binding DetailsCommand}"       Width="130" Style="{StaticResource AccountButton}"/>
+                    <Button Content="Update Account"  Command="{Binding UpdateAccountCommand}" Width="130" Style="{StaticResource AccountButton}"/>
+                    <Button Content="Delete Account"  Command="{Binding DeleteCommand}"        Width="130" Style="{StaticResource AccountButton}"/>
+
+                    <!-- Separator -->
+                    <Border Width="1" Background="#9CA3AF" Margin="6,2,14,2"/>
+
+                    <!-- CUSTOMER -->
+                    <Button Content="Add Customer"      Command="{Binding AddCustomerCommand}"     Width="140" Style="{StaticResource CustomerButton}"/>
+                    <Button Content="Customer Details"  Command="{Binding CustomerDetailsCommand}" Width="140" Style="{StaticResource CustomerButton}"/>
+                    <Button Content="Update Customer"   Command="{Binding UpdateCustomerCommand}"  Width="150" Style="{StaticResource CustomerButton}"/>
+                    <Button Content="Delete Customer"   Command="{Binding DeleteCustomerCommand}"  Width="145" Style="{StaticResource DangerButton}"/>
                 </StackPanel>
 
                 <Grid Grid.Row="1">
