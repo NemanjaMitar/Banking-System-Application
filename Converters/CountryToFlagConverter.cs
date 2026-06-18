@@ -6,6 +6,7 @@ using BankingSystem.Model;
 
 namespace BankingSystem.Converters
 {
+    //              ==== Pomocna klasa koja konvertuje ENUM Country u sliku koja se printuje kao drzava
     public class CountryToFlagConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)

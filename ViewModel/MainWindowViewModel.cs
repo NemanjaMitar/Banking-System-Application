@@ -11,12 +11,16 @@ namespace BankingSystem.ViewModel
 {
     public class MainWindowViewModel : INotifyPropertyChanged
     {
+        // Baza + RNG
         private readonly BankContext context;
         private static readonly Random _rng = new Random();
 
+        // Klienti i filtirani racuni za trenutno izabranog klijenta
         public ObservableCollection<Customer> Customers { get; set; }
         public ObservableCollection<AccountBase> FilteredAccounts { get; set; }
 
+
+        #region Properties
         private Customer _selectedCustomer;
         public Customer SelectedCustomer
         {
@@ -27,6 +31,7 @@ namespace BankingSystem.ViewModel
                 {
                     _selectedCustomer = value;
                     OnPropertyChanged();
+                    // Ucitava racune 
                     LoadAccountsForSelectedCustomer();
                 }
             }
@@ -39,14 +44,17 @@ namespace BankingSystem.ViewModel
             set { _selectedAccount = value; OnPropertyChanged(); }
         }
 
+        #endregion
+        #region Relay Commands
         public RelayCommand AddCommand { get; }
         public RelayCommand DetailsCommand { get; }
         public RelayCommand DeleteCommand { get; }
         public RelayCommand AddCustomerCommand { get; }
-
         public RelayCommand UpdateAccountCommand { get; }
         public RelayCommand UpdateCustomerCommand { get; }
         public RelayCommand DeleteCustomerCommand { get; }
+        public RelayCommand CustomerDetailsCommand { get; }
+        #endregion
 
         public MainWindowViewModel()
         {
@@ -70,7 +78,32 @@ namespace BankingSystem.ViewModel
             UpdateAccountCommand = new RelayCommand(OnUpdateAccount);
             UpdateCustomerCommand = new RelayCommand(OnUpdateCustomer);
             DeleteCustomerCommand = new RelayCommand(OnDeleteCustomer);
+            CustomerDetailsCommand = new RelayCommand(OnCustomerDetails);
         }
+        private void OnCustomerDetails()
+        {
+            if (SelectedCustomer == null)
+            {
+                MessageBox.Show("Select a customer first.");
+                return;
+            }
+
+            int accountCount = context.Accounts
+                .Count(a => a.CustomerId == SelectedCustomer.Id);
+
+            string dob = SelectedCustomer.DateOfBirth.HasValue
+                ? SelectedCustomer.DateOfBirth.Value.ToShortDateString()
+                : "—";
+
+            MessageBox.Show(
+                $"Id: {SelectedCustomer.Id}\n" +
+                $"Full name: {SelectedCustomer.FullName}\n" +
+                $"Date of birth: {dob}\n" +
+                $"Age: {SelectedCustomer.Age}\n" +
+                $"Email: {SelectedCustomer.Email}\n" +
+                $"Number of accounts: {accountCount}");
+        }
+
 
         private void OnUpdateAccount()
         {
@@ -127,9 +160,8 @@ namespace BankingSystem.ViewModel
 
             if (SelectedCustomer == null)
                 return;
-
+            // Probati mozda odraditi bypass ovog fielda? I raditi preko kljuceva? Zar nije to cela poenta DB?
             var accounts = context.Accounts
-                .Include(a => a.Customer)
                 .Where(a => a.CustomerId == SelectedCustomer.Id)
                 .ToList();
 
@@ -225,9 +257,11 @@ namespace BankingSystem.ViewModel
             }
         }
 
+        #region PropertyChanged
         public event PropertyChangedEventHandler PropertyChanged;
 
         protected void OnPropertyChanged([CallerMemberName] string name = null)
             => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        #endregion
     }
 }

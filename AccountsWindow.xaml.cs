@@ -12,7 +12,8 @@ namespace BankingSystem
     {
         private readonly Customer _customer;
         private readonly AccountBase _editing;   // null = add, set = edit
-
+                                                 // true samo u ADD modu — u EDIT modu ova polja su zaključana
+        public bool IsAddMode => _editing == null;
         public AccountBase NewAccount { get; private set; }
 
         public ObservableCollection<Country> CountryOptions { get; } =

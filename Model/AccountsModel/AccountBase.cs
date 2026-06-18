@@ -2,21 +2,34 @@
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+/*
+
+    =================| account base - abstraktna roditeljska klasa svih ostalih racuna |========================
+    Svaki racun sadrzi:
+        - IBan
+        - Stanje
+        - ID klienta koji ga poseduje
+        - ID za nalog sam po sebi (zasto tho?)
+        - Drzavu 
+        - Property Customer (zasto tho?)
+*/
 
 namespace BankingSystem.Model
 {
     public abstract class AccountBase : INotifyPropertyChanged, IAccount
     {
+
+        #region Fields
         private decimal balance;
         private Guid accountGuid;
         private Guid customerId;
         private string iban;
-        private Country country = Country.RS; // domestic default
+        private Country country = Country.RS; // Srbija default
+        #endregion
 
         #region Properties, INotifyPropertyChanged
-
-        [Key]
-        [StringLength(34)]
+        [Key]              // Primarni kljuc za DB, svaki racun ima svoj unikatni International Banking Account Number
+        [StringLength(34)] // Ogranicava duzinu u AccountDB
         public string Iban
         {
             get => iban;
@@ -28,14 +41,13 @@ namespace BankingSystem.Model
             get => accountGuid;
             set { if (accountGuid != value) { accountGuid = value; OnPropertyChanged(nameof(AccountGuid)); } }
         }
-
         public decimal Balance
         {
             get => balance;
             set { if (balance != value) { balance = value; OnPropertyChanged(nameof(Balance)); } }
         }
 
-        [ForeignKey(nameof(Customer))]
+        [ForeignKey(nameof(Customer))]  // Strani kljuc za CustomersDB, odnosi se na GUID od klienta kome racun pripada
         public Guid CustomerId
         {
             get => customerId;
@@ -49,6 +61,8 @@ namespace BankingSystem.Model
         }
         #endregion
 
+
+        // Property za Customera? sta je ovo
         public virtual Customer Customer { get; set; }
 
         //========================| KONSTRUKTORI |===========================
@@ -64,7 +78,7 @@ namespace BankingSystem.Model
             Balance = balance;
         }
 
-        #region IAccount
+        #region IAccount implement
         public virtual void Deposit(decimal amount)
         {
             if (amount <= 0)
@@ -88,7 +102,7 @@ namespace BankingSystem.Model
         public abstract bool CanReceiveInternationalTransfer();
         #endregion
 
-        [NotMapped]
+        [NotMapped] //The C# Entity Framework [NotMapped] attribute explicitly excludes properties or entire classes from database mapping. 
         public string CurrencyDisplay
         {
             get

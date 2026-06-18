@@ -20,15 +20,19 @@
         <TextBlock Text="Country:" Grid.Row="2" Grid.Column="0" Margin="5"/>
         <ComboBox ItemsSource="{Binding CountryOptions}"
           SelectedItem="{Binding SelectedCountry}"
+          IsEnabled="{Binding IsAddMode}"
           Grid.Row="2" Grid.Column="1" Margin="5"/>
+        
+        
         <TextBlock Text="Initial Balance:" Grid.Row="1" Grid.Column="0" Margin="5"/>
         <TextBox Text="{Binding InitialBalance, UpdateSourceTrigger=PropertyChanged}"
                  Grid.Row="1" Grid.Column="1" Margin="5"/>
 
         <TextBlock Text="Currency:" Grid.Row="3" Grid.Column="0" Margin="5"/>
         <ComboBox ItemsSource="{Binding CurrencyOptions}"
-                  SelectedItem="{Binding SelectedCurrency}"
-                  Grid.Row="3" Grid.Column="1" Margin="5"/>
+          SelectedItem="{Binding SelectedCurrency}"
+          IsEnabled="{Binding IsAddMode}"
+          Grid.Row="3" Grid.Column="1" Margin="5"/>
 
         <CheckBox Content="Can receive international transfer"
                   IsChecked="{Binding CanReceiveInternationalTransfer, Mode=OneWay}"

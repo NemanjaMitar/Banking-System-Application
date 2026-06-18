@@ -2,7 +2,7 @@
 
 namespace BankingSystem.Model
 {
-    //   ===========================| Baza u kojoj cuvamo korisnike |================================
+    //   ===========================| Baza u kojoj cuvamo korisnike i racune |================================
     public class BankContext : DbContext
     {
         public BankContext() : base("name=BankingSystemDb"){ }

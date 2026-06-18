@@ -6,6 +6,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 // =====================| Klasa klijenta koji poseduje vise racuna |=======================
 // Ime, Prezime, Datum rodjenja, Email
+// ID
 
 namespace BankingSystem.Model
 {
@@ -102,7 +103,10 @@ namespace BankingSystem.Model
 
         public override string ToString() => FullName;
 
+
+        #region PropertyChanged
         public event PropertyChangedEventHandler PropertyChanged;
         protected void OnPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        #endregion
     }
 }
